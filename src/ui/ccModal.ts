@@ -1,7 +1,8 @@
 /// <reference types="tampermonkey" />
 import { WPLACE_FREE, WPLACE_PAID, WPLACE_NAMES, DEFAULT_FREE_KEYS } from '../core/palette';
 import { createCanvas } from '../core/canvas';
-import { config, saveConfig } from '../core/store';
+import { colorCaches } from '../core/cache';
+import { config, saveConfig, type OverlayItem } from '../core/store';
 import { MAX_OVERLAY_DIM } from '../core/constants';
 import { ensureHook } from '../core/hook';
 import { clearOverlayCache, paletteDetectionCache } from '../core/cache';
@@ -38,7 +39,7 @@ type CCState = {
   selectedPaid: Set<string>;
   realtime: boolean;
 
-  overlay: any | null;
+  overlay: OverlayItem | null;
   lastColorCounts: Record<string, number>;
   isStale: boolean;
 };
@@ -191,7 +192,7 @@ export function buildCCModal() {
   renderPaletteGrid();
 }
 
-export function openCCModal(overlay: any) {
+export function openCCModal(overlay: OverlayItem) {
   if (!cc) return;
   cc.overlay = overlay;
 
@@ -233,7 +234,7 @@ function closeCCModal() {
 }
 
 function weightedNearest(r: number, g: number, b: number, palette: number[][]) {
-  let best: number[] | null = null, bestDist = Infinity;
+  let best: [number, number, number] | null = null, bestDist = Infinity;
   for (let i = 0; i < palette.length; i++) {
     const [pr, pg, pb] = palette[i];
     const rmean = (pr + r) / 2;
@@ -243,7 +244,7 @@ function weightedNearest(r: number, g: number, b: number, palette: number[][]) {
     const x = (512 + rmean) * rdiff * rdiff >> 8;
     const y = 4 * gdiff * gdiff;
     const z = (767 - rmean) * bdiff * bdiff >> 8;
-    const dist = Math.sqrt(x + y + z);
+    const dist = x + y + z;
     if (dist < bestDist) { bestDist = dist; best = [pr, pg, pb]; }
   }
   return best || [0,0,0];
@@ -266,11 +267,23 @@ function processImage() {
 
   const palette = getActivePalette();
   const counts: Record<string, number> = {};
+  const id = cc.overlay.id;
+  let colorCache = colorCaches.get(id);
+  if (!colorCache) {
+    colorCache = new Map();
+    colorCaches.set(id, colorCache);
+  }
 
   for (let i = 0; i < src.length; i += 4) {
     const r = src[i], g = src[i+1], b = src[i+2], a = src[i+3];
     if (a === 0) { out[i]=0; out[i+1]=0; out[i+2]=0; out[i+3]=0; continue; }
-    const [nr, ng, nb] = palette.length ? weightedNearest(r,g,b,palette) : [r,g,b];
+    const color = (r<<24)|(g<<16)|(b<<8)|a;
+    let cached = colorCache.get(color);
+    if (!cached) {
+      cached = palette.length ? weightedNearest(r,g,b,palette) : [r,g,b];
+      colorCache.set(color, cached);
+    }
+    const [nr, ng, nb] = cached;
     out[i]=nr; out[i+1]=ng; out[i+2]=nb; out[i+3]=255;
     const key = `${nr},${ng},${nb}`;
     counts[key] = (counts[key] || 0) + 1;

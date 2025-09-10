@@ -42,11 +42,10 @@ function findClosestColorIndex(r: number, g: number, b: number) {
   let index = 0;
   for (let i = 0; i < ALL_COLORS.length; i++) {
     const color = ALL_COLORS[i];
-    const distance = Math.sqrt(
+    const distance = 
       Math.pow(r - color[0], 2) +
       Math.pow(g - color[1], 2) +
-      Math.pow(b - color[2], 2)
-    );
+      Math.pow(b - color[2], 2);
     if (distance < minDistance) {
       minDistance = distance;
       index = i;

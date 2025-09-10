@@ -24,6 +24,7 @@ export const overlayCache = new LRUCache<string, any>(500);
 export const imageDecodeCache = new LRUCache<string, HTMLImageElement>(64);
 export const paletteDetectionCache = new LRUCache<string, boolean>(200);
 export const baseMinifyCache = new LRUCache<string, ImageData>(100);
+export const colorCaches = new LRUCache<string, Map<number, [number, number, number]>>(500);
 export const tooLargeOverlays = new Set<string>();
 
 export function clearOverlayCache() {
@@ -31,5 +32,6 @@ export function clearOverlayCache() {
   imageDecodeCache.clear();
   paletteDetectionCache.clear();
   baseMinifyCache.clear();
+  colorCaches.clear();
   tooLargeOverlays.clear();
 }
