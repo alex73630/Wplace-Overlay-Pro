@@ -1,11 +1,11 @@
 import esbuild from 'esbuild';
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DEV = process.argv.includes('--watch');
-const outFile = resolve(__dirname, 'dist', 'Wplace Overlay Pro.user.js');
+const outFile = resolve(__dirname, 'dist', 'Wplace.Overlay.Pro.user.js');
 const metaPath = resolve(__dirname, 'src', 'meta.js');
 
 // Plugin: prepend metadata banner after each build
@@ -44,6 +44,7 @@ const buildOptions = {
 
 async function buildOnce() {
   await esbuild.build(buildOptions);
+  await copyFile(metaPath, resolve(dirname(outFile), 'Wplace Overlay Pro.meta.js'));
   console.log('[build] Done.');
 }
 
