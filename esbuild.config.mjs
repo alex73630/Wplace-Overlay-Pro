@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DEV = process.argv.includes('--watch');
 const outFile = resolve(__dirname, 'dist', 'Wplace.Overlay.Pro.user.js');
+const outMetaFile = resolve(__dirname, 'dist', 'Wplace.Overlay.Pro.meta.js');
 const metaPath = resolve(__dirname, 'src', 'meta.js');
 
 // Plugin: prepend metadata banner after each build
@@ -44,7 +45,7 @@ const buildOptions = {
 
 async function buildOnce() {
   await esbuild.build(buildOptions);
-  await copyFile(metaPath, resolve(dirname(outFile), 'Wplace Overlay Pro.meta.js'));
+  await copyFile(metaPath, outMetaFile);
   console.log('[build] Done.');
 }
 
