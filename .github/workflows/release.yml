@@ -20,6 +20,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate meta.js
+        run: |
+          TAG_VERSION="${GITHUB_REF##*/}"
+          VERSION="${TAG_VERSION#v}"
+          VERSION="$VERSION" node scripts/generateMeta.js
+
       - name: Build project
         run: npm run build
 
