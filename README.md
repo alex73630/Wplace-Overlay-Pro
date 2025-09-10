@@ -8,11 +8,25 @@ License: [`LICENSE.md`](LICENSE.md:1)
 ---
 
 ## Quick links
-- Prebuilt userscript (install in Tampermonkey / Greasemonkey): [`dist/Wplace\ Overlay\ Pro.user.js`](dist/Wplace\ Overlay\ Pro.user.js:1)  
+- Prebuilt userscript (install in Tampermonkey / Greasemonkey) from the GitHub Releases : [latest release](https://github.com/alex73630/Wplace-Overlay-Pro/releases/latest/download/Wplace.Overlay.Pro.user.js)
 - Build script (from source): see the `build` script in [`package.json`](package.json:7)  
 - Development watch script: see `watch` in [`package.json`](package.json:8)  
 - Important constants (limits): [`src/core/constants.ts`](src/core/constants.ts:1)  
 - UI implementation: [`src/ui/panel.ts`](src/ui/panel.ts:1)
+
+---
+
+## Fork notes
+
+This is a fork based on the original [Wplace-Overlay-Pro](https://github.com/ShinkoNet/Wplace-Overlay-Pro) project by [shinkonet](https://github.com/ShinkoNet/).
+
+It aims to implement active Pull Requests and other changes that I wanted to have on my machines and distribute more easily to friends who are also users of the script.
+
+As per the original license, all the changes are provided under the same license and are stated in the Git history.
+
+I also acknowledge the work of developers that have been merged in this fork :
+- [Decrypt](https://github.com/Decryptu) for their work [on optimizing the symbols view](https://github.com/ShinkoNet/Wplace-Overlay-Pro/pull/5)
+- [CrazyboyQCD](https://github.com/CrazyboyQCD) for their work [on optimizing colors matching](https://github.com/ShinkoNet/Wplace-Overlay-Pro/pull/6)
 
 ---
 
@@ -129,6 +143,8 @@ These are emitted via the internal event helpers (see `src/core/events.ts`).
 
 ## License & credits
 - License: GPLv3 (see [`LICENSE.md`](LICENSE.md:1)
+- Original author: [shinkonet](https://github.com/ShinkoNet/)
+- Original project: [Wplace-Overlay-Pro](https://github.com/ShinkoNet/Wplace-Overlay-Pro)
 
 ---
 
