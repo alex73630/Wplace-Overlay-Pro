@@ -7,6 +7,10 @@ import { resolve } from 'node:path';
 export async function generateMeta() {
   let VERSION = process.env.VERSION;
 
+  if (VERSION.startsWith("v")) {
+    VERSION = VERSION.slice(1);
+  }
+
   if (!VERSION) {
     console.warn(
       'Missing VERSION environment variable. Setting it to current package.json version'

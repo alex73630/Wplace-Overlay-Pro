@@ -21,10 +21,9 @@ jobs:
         run: npm ci
 
       - name: Build project
-        run: |
-          TAG_VERSION="${GITHUB_REF##*/}"
-          VERSION="${TAG_VERSION#v}"
-          npm run build
+        env:
+          VERSION: ${{ github.ref_name }}
+        run: npm run build
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
