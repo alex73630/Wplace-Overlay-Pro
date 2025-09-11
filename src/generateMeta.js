@@ -30,7 +30,7 @@ export async function generateMeta() {
 // @grant        unsafeWindow
 // @connect      *
 // @run-at       document-start
-// @downloadURL  https://github.com/alex73630/Wplace-Overlay-Pro/releases/download/v${VERSION}/Wplace.Overlay.Pro.user.js
+// @downloadURL  https://github.com/alex73630/Wplace-Overlay-Pro/releases/latest/download/Wplace.Overlay.Pro.user.js
 // @updateURL    https://github.com/alex73630/Wplace-Overlay-Pro/releases/latest/download/Wplace.Overlay.Pro.meta.js
 // ==/UserScript==
 `
