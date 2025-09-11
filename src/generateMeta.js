@@ -1,28 +1,20 @@
-// Usage: VERSION=3.1.7 node scripts/generateMeta.js
-// Generates src/meta.js with the correct @version and @downloadURL
-
-import { writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
-
 export async function generateMeta() {
-  let VERSION = process.env.VERSION;
+	let VERSION = process.env.VERSION
 
-  if (VERSION.startsWith("v")) {
-    VERSION = VERSION.slice(1);
-  }
+	if (VERSION.startsWith("v")) {
+		VERSION = VERSION.slice(1)
+	}
 
-  if (!VERSION) {
-    console.warn(
-      'Missing VERSION environment variable. Setting it to current package.json version'
-    );
+	if (!VERSION) {
+		console.warn("Missing VERSION environment variable. Setting it to current package.json version")
 
-    const packageJson = await import("../package.json", {
-      with: { type: "json" },
-    })
-    VERSION = packageJson.default.version;
-  }
+		const packageJson = await import("../package.json", {
+			with: { type: "json" }
+		})
+		VERSION = packageJson.default.version
+	}
 
-  const meta = `// ==UserScript==
+	const meta = `// ==UserScript==
 // @name         Wplace Overlay Pro
 // @namespace    http://tampermonkey.net/
 // @version      ${VERSION}
@@ -41,8 +33,8 @@ export async function generateMeta() {
 // @downloadURL  https://github.com/alex73630/Wplace-Overlay-Pro/releases/download/v${VERSION}/Wplace.Overlay.Pro.user.js
 // @updateURL    https://github.com/alex73630/Wplace-Overlay-Pro/releases/latest/download/Wplace.Overlay.Pro.meta.js
 // ==/UserScript==
-`;
+`
 
-  console.log(`[generateMeta] Generated metadata for version ${VERSION}`);
-  return meta;
+	console.log(`[generateMeta] Generated metadata for version ${VERSION}`)
+	return meta
 }

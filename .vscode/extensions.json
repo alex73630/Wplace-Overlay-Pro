@@ -1,0 +1,9 @@
+{
+	"recommendations": [
+		"biomejs.biome",
+		"usernamehw.errorlens",
+		"EditorConfig.EditorConfig",
+		"YoavBls.pretty-ts-errors",
+		"aaron-bond.better-comments"
+	]
+}

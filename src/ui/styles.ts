@@ -1,8 +1,8 @@
 export function injectStyles() {
-  if (document.getElementById('op-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'op-styles';
-  style.textContent = `
+	if (document.getElementById("op-styles")) return
+	const style = document.createElement("style")
+	style.id = "op-styles"
+	style.textContent = `
       body.op-theme-light {
         --op-bg: #ffffff;
         --op-border: #e6ebf2;
@@ -200,6 +200,6 @@ export function injectStyles() {
       .op-pan-grabbing { cursor: grabbing; }
 
       .op-rs-footer { padding: 10px 12px; border-top: 1px solid var(--op-border); display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
-  `;
-  document.head.appendChild(style);
+  `
+	document.head.appendChild(style)
 }

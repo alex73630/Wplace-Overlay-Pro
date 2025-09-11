@@ -1,15 +1,17 @@
 {
-  "name": "wplace-overlay-pro",
-  "version": "3.0.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "build": "node esbuild.config.mjs",
-    "watch": "node esbuild.config.mjs --watch"
-  },
-  "devDependencies": {
-    "@types/tampermonkey": "^5.0.4",
-    "esbuild": "^0.25.8",
-    "typescript": "^5.6.2"
-  }
+	"name": "wplace-overlay-pro",
+	"version": "3.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "node esbuild.config.mjs",
+		"watch": "node esbuild.config.mjs --watch",
+		"lint": "biome check --write"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.2.4",
+		"@types/tampermonkey": "^5.0.4",
+		"esbuild": "^0.25.8",
+		"typescript": "^5.6.2"
+	}
 }
