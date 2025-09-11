@@ -10,6 +10,7 @@ import { buildCCModal, openCCModal } from './ccModal';
 import { buildRSModal, openRSModal } from './rsModal';
 import { EV_ANCHOR_SET, EV_AUTOCAP_CHANGED } from '../core/events';
 import { updatePaletteSymbols } from '../core/palette-inject';
+import { forceTileRefresh } from '../core/tile';
 
 let panelEl: HTMLDivElement | null = null;
 
@@ -25,7 +26,7 @@ export function createUI() {
   const panelW = 340;
   const defaultLeft = Math.max(12, window.innerWidth - panelW - 80);
   const initLeft = (typeof config.panelX === 'number' && Number.isFinite(config.panelX)) ? config.panelX : defaultLeft;
-  const initTop  = (typeof config.panelY === 'number' && Number.isFinite(config.panelY)) ? config.panelY : 120;
+  const initTop = (typeof config.panelY === 'number' && Number.isFinite(config.panelY)) ? config.panelY : 120;
   panel.style.left = `${initLeft}px`;
   panel.style.top = `${initTop}px`;
 
@@ -301,44 +302,60 @@ function copyText(text: string) {
 
 function addEventListeners(panel: HTMLDivElement) {
   $('op-theme-toggle')?.addEventListener('click', async (e) => { e.stopPropagation(); config.theme = config.theme === 'light' ? 'dark' : 'light'; await saveConfig(['theme']); applyTheme(); });
-  $('op-refresh-btn')?.addEventListener('click', (e) => { e.stopPropagation(); location.reload(); });
+  $('op-refresh-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const btn = e.currentTarget as HTMLButtonElement;
+
+    btn.disabled = true;
+    btn.innerHTML = `<span style="font-family: monospace; font-weight: bold;">...</span>`;
+
+    clearOverlayCache();
+    forceTileRefresh();
+
+    setTimeout(() => {
+      btn.innerHTML = '⟲';
+      btn.disabled = false;
+    }, 1500);
+  });
   $('op-panel-toggle')?.addEventListener('click', (e) => { e.stopPropagation(); config.isPanelCollapsed = !config.isPanelCollapsed; saveConfig(['isPanelCollapsed']); updateUI(); });
 
   panel.querySelectorAll('.op-tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        const mode = btn.getAttribute('data-mode') as 'above' | 'minify' | 'original';
-        if (mode === 'above') {
-            config.overlayMode = 'behind';
-        } else {
-            config.overlayMode = mode;
-        }
-        saveConfig(['overlayMode']);
-        ensureHook();
-        updateUI();
-        updatePaletteSymbols();
+      const mode = btn.getAttribute('data-mode') as 'above' | 'minify' | 'original';
+      if (mode === 'above') {
+        config.overlayMode = 'behind';
+      } else {
+        config.overlayMode = mode;
+      }
+      saveConfig(['overlayMode']);
+      ensureHook();
+      updateUI();
+      updatePaletteSymbols();
     });
   });
 
   const styleDotsEl = $('op-style-dots') as HTMLInputElement | null;
-  styleDotsEl?.addEventListener('change', () => { 
-    if (styleDotsEl.checked) { 
-      config.minifyStyle = 'dots'; 
-      saveConfig(['minifyStyle']); 
-      clearOverlayCache(); 
+  styleDotsEl?.addEventListener('change', () => {
+    if (styleDotsEl.checked) {
+      config.minifyStyle = 'dots';
+      saveConfig(['minifyStyle']);
+      clearOverlayCache();
       ensureHook();
       updatePaletteSymbols();
-    } 
+      forceTileRefresh();
+    }
   });
 
   const styleSymbolsEl = $('op-style-symbols') as HTMLInputElement | null;
-  styleSymbolsEl?.addEventListener('change', () => { 
-    if (styleSymbolsEl.checked) { 
-      config.minifyStyle = 'symbols'; 
-      saveConfig(['minifyStyle']); 
-      clearOverlayCache(); 
+  styleSymbolsEl?.addEventListener('change', () => {
+    if (styleSymbolsEl.checked) {
+      config.minifyStyle = 'symbols';
+      saveConfig(['minifyStyle']);
+      clearOverlayCache();
       ensureHook();
       updatePaletteSymbols();
-    } 
+      forceTileRefresh();
+    }
   });
 
   $('op-autocap-toggle')?.addEventListener('click', () => { config.autoCapturePixelUrl = !config.autoCapturePixelUrl; saveConfig(['autoCapturePixelUrl']); ensureHook(); updateUI(); });
@@ -371,7 +388,7 @@ function addEventListeners(panel: HTMLDivElement) {
   });
 
   const dropzone = $('op-dropzone') as HTMLDivElement | null;
-  dropzone?.addEventListener('click', () => ( $('op-file-input') as HTMLInputElement | null )?.click());
+  dropzone?.addEventListener('click', () => ($('op-file-input') as HTMLInputElement | null)?.click());
   const fileInput = $('op-file-input') as HTMLInputElement | null;
   fileInput?.addEventListener('change', async (e: Event) => {
     const target = e.target as HTMLInputElement;
@@ -409,7 +426,9 @@ function addEventListeners(panel: HTMLDivElement) {
     const valEl = $('op-opacity-value');
     if (valEl) valEl.textContent = `${Math.round(ov.opacity * 100)}%`;
   });
-  opacitySlider?.addEventListener('change', async () => { await saveConfig(['overlays']); clearOverlayCache(); });
+  opacitySlider?.addEventListener('change', async () => {
+    await saveConfig(['overlays']); clearOverlayCache();
+    forceTileRefresh(); });
 
   $('op-download-overlay')?.addEventListener('click', () => {
     const ov = getActiveOverlay();
@@ -453,9 +472,9 @@ function enableDrag(panel: HTMLDivElement) {
     if (!isDragging) return;
     const dx = e.clientX - startX, dy = e.clientY - startY;
     const maxLeft = Math.max(8, window.innerWidth - panel.offsetWidth - 8);
-    const maxTop  = Math.max(8, window.innerHeight - panel.offsetHeight - 8);
+    const maxTop = Math.max(8, window.innerHeight - panel.offsetHeight - 8);
     panel.style.left = `${clamp(startLeft + dx, 8, maxLeft)}px`;
-    panel.style.top  = `${clamp(startTop  + dy, 8, maxTop)}px`;
+    panel.style.top = `${clamp(startTop + dy, 8, maxTop)}px`;
     moved = true;
   };
   const onPointerUp = (e: PointerEvent) => {
@@ -475,9 +494,9 @@ function enableDrag(panel: HTMLDivElement) {
   window.addEventListener('resize', () => {
     const rect = panel.getBoundingClientRect();
     const maxLeft = Math.max(8, window.innerWidth - panel.offsetWidth - 8);
-    const maxTop  = Math.max(8, window.innerHeight - panel.offsetHeight - 8);
+    const maxTop = Math.max(8, window.innerHeight - panel.offsetHeight - 8);
     const newLeft = Math.min(Math.max(rect.left, 8), maxLeft);
-    const newTop  = Math.min(Math.max(rect.top, 8), maxTop);
+    const newTop = Math.min(Math.max(rect.top, 8), maxTop);
     panel.style.left = `${newLeft}px`; panel.style.top = `${newTop}px`;
     config.panelX = newLeft; config.panelY = newTop; saveConfig(['panelX', 'panelY']);
   });
@@ -550,9 +569,9 @@ export function updateUI() {
     const mode = btn.getAttribute('data-mode');
     let isActive = false;
     if (mode === 'above' && (config.overlayMode === 'above' || config.overlayMode === 'behind')) {
-        isActive = true;
+      isActive = true;
     } else {
-        isActive = mode === config.overlayMode;
+      isActive = mode === config.overlayMode;
     }
     (btn as HTMLButtonElement).classList.toggle('active', isActive);
   });
@@ -584,7 +603,7 @@ export function updateUI() {
   if (dotsEl) dotsEl.checked = config.minifyStyle === 'dots';
   const symbolsEl = $('op-style-symbols') as HTMLInputElement | null;
   if (symbolsEl) symbolsEl.checked = config.minifyStyle === 'symbols';
-  
+
   const layeringBtns = $('op-layering-btns') as HTMLDivElement | null;
   if (layeringBtns) {
     layeringBtns.innerHTML = '';
